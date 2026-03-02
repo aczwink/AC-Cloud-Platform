@@ -1,5 +1,5 @@
 resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
-  name: 'prdsttfstate'
+  name: 'prdstactfstate'
   location: resourceGroup().location
   sku: {
     name: 'Standard_LRS'

@@ -1,7 +1,7 @@
 terraform {
     backend "azurerm" {
-        resource_group_name = "${local.env}-rg-terraform-state"
-        storage_account_name = "${local.env}sttfstate"
+        resource_group_name = "prd-rg-terraform-state"
+        storage_account_name = "prdstactfstate"
         container_name = "terraform-state-acplatform"
         key = "terraform.tfstate"
     }
