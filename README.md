@@ -1,0 +1,1 @@
+[![Deploy infrastructure](https://github.com/aczwink/AC-Cloud-Platform/actions/workflows/deploy.yml/badge.svg)](https://github.com/aczwink/AC-Cloud-Platform/actions/workflows/deploy.yml)
