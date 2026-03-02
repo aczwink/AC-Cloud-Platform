@@ -44,9 +44,9 @@ jobs:
         working-directory: ./environments/prod
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform validate -input=false
         working-directory: ./environments/prod
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
         working-directory: ./environments/prod
