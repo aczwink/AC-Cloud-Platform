@@ -40,11 +40,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
       
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
         working-directory: ./environments/prod
 
       - name: Terraform Validate
-        run: terraform validate -input=false
+        run: terraform validate
         working-directory: ./environments/prod
 
       - name: Terraform Apply
