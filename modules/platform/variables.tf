@@ -17,8 +17,3 @@ variable "location" {
         error_message = "Region must be one of: westeurope."
     }
 }
-
-variable "resourceGroupName" {
-    description = "Name of the platform resource group"
-    type = string
-}

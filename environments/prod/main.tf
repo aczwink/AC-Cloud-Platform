@@ -7,5 +7,4 @@ module "platform" {
 
     environment = local.env
     location = var.location
-    resourceGroupName = azurerm_resource_group.platformRG.name
 }
