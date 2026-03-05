@@ -36,9 +36,10 @@ jobs:
 
       #TODO: do a webpack bundle!
       - name: Build node webserver
-        run: |
-          cp ./integration/node-webserver/package.json ./ackungfudoc/dist/out/
-          npm i
+        run: cp ./integration/node-webserver/package.json ./ackungfudoc/dist/out/
+      - name: Build node webserver 2
+        run: npm i
+        working-directory: ./ackungfudoc/dist/out/
         
       - name: Deploying to App Service
         run: |
