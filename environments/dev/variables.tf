@@ -3,7 +3,7 @@ variable "location" {
     type = string
 
     validation {
-        condition = contains(["francecentral", "westeurope"], var.location)
-        error_message = "Region must be one of: westeurope."
+        condition = contains(["eastus2", "westeurope"], var.location)
+        error_message = "Region must be one of: eastus2, westeurope."
     }
 }
