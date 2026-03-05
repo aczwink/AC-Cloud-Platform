@@ -15,6 +15,10 @@ on:
 
 jobs:
   deploy:
+    env:
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+    environment: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
     #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       id-token: write
@@ -54,5 +58,5 @@ jobs:
       - name: Deploying to App Service
         run: |
           zip -r ./azure.zip .
-          az webapp deploy --resource-group prd-rg-kungfudoc --name ackungfudoc --src-path ./azure.zip
+          az webapp deploy --resource-group ${envAbbrev}-rg-kungfudoc --name ${envPrefix}ackungfudoc --src-path ./azure.zip
         working-directory: ./ackungfudoc/dist/out
