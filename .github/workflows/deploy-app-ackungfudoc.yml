@@ -1,10 +1,17 @@
 name: Deploy ACKungFuDoc app
 
 on:
+  push: #TODO REMOVE THIS!!!!
+    branches:
+      - main
+      - dev
   workflow_run:
     workflows: ["Deploy infrastructure"]
     types:
       - completed
+    branches:
+      - main
+      - dev
 
 jobs:
   deploy:
