@@ -1,6 +1,5 @@
-#wget https://github.com/aczwink/KungFuWiki/archive/refs/heads/main.zip
-unzip KungFuWiki-main.zip
-cd KungFuWiki-main
+git clone https://github.com/aczwink/KungFuWiki.git
+cd KungFuWiki
 
 npm i
 npm run build
@@ -14,4 +13,4 @@ az webapp deploy --resource-group dev-rg-kungfudoc --name devackungfudoc --src-p
 cd ../..
 
 cd ..
-rm -rf ./KungFuWiki-main
+rm -rf ./KungFuWiki

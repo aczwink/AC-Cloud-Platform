@@ -19,8 +19,29 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Checkout ACKungFuDoc repo
         uses: actions/checkout@v4
         with:
             repository: aczwink/KungFuWiki
             path: ackungfudoc
+
+      - name: Build ACKungFuDoc #TODO: should use ci here
+        run: |
+          npm i
+          npm run build
+        working-directory: ./ackungfudoc
+
+      #TODO: do a webpack bundle!
+      - name: Build node webserver
+        run: |
+          cp ./integration/node-webserver/package.json ./ackungfudoc/dist/out/
+          npm i
+        
+      - name: Deploying to App Service
+        run: |
+          zip -r ./azure.zip .
+          az webapp deploy --resource-group prd-rg-kungfudoc --name ackungfudoc --src-path ./azure.zip
+        working-directory: ./ackungfudoc/dist/out
