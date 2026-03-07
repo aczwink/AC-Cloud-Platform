@@ -1,0 +1,53 @@
+name: Deploy app - ArabicMusicEncyclopedia
+
+on:
+  push: #TODO REMOVE THIS!!!!
+    branches:
+      - main
+      - dev
+  workflow_run:
+    workflows: ["Deploy infrastructure"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    env:
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout OpenArabicMusicDB repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabicMusicDB
+            path: openarabicmusicdb
+
+      - name: Build OpenArabicMusicDB builder
+        run: |
+          npm ci
+        working-directory: ./openarabicmusicdb/builder
+
+      - name: Checkout ArabicMusicEncyclopedia repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/ArabicMusicEncyclopedia
+            path: arabicmusicencyclopedia
+
+      - name: Build ArabicMusicEncyclopedia backend
+        run: |
+          npm ci
+          npm run build-release-package
+        working-directory: ./arabicmusicencyclopedia/backend

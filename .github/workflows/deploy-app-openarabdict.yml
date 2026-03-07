@@ -1,0 +1,64 @@
+name: Deploy app - OpenArabDict
+
+on:
+  push: #TODO REMOVE THIS!!!!
+    branches:
+      - main
+      - dev
+  workflow_run:
+    workflows: ["Deploy infrastructure"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    env:
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout OpenArabDict repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabDict
+            path: openarabdict
+
+      - name: Build OpenArabDict builder
+        run: |
+          npm ci
+          npm run compile
+        working-directory: ./openarabdict/builder
+
+      - name: Build OpenArabDict database
+        run: npm run build-db
+        working-directory: ./openarabdict/builder
+
+      - name: Publish OpenArabDict database to Azure
+        run: |
+          az storage blob upload --file ./dist/dict.json --blob-url https://openarabdictdbstorage.blob.core.windows.net/dbstorage/dict.json --auth-mode login --overwrite
+          az storage blob upload --file ./dist/en.json --blob-url https://openarabdictdbstorage.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
+        working-directory: ./openarabdict/builder
+
+      - name: Checkout OpenArabDictViewer repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabDictViewer
+            path: openarabdictviewer
+
+      - name: Build OpenArabDictViewer backend
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./openarabdictviewer/backend

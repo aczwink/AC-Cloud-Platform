@@ -1,4 +1,4 @@
-name: Deploy ACKungFuDoc app
+name: Deploy app - ACKungFuDoc
 
 on:
   push: #TODO REMOVE THIS!!!!
@@ -18,7 +18,7 @@ jobs:
     env:
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
       envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
-    environment: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
     #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       id-token: write
