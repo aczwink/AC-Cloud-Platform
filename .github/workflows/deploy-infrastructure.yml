@@ -16,8 +16,8 @@ jobs:
   deploy:
     env:
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
-      RG_NAME: ${envAbbrev}-rg-terraform-state
-      LOCATION: westeurope
+      RG_NAME: ${{ github.ref_name == 'main' && 'prd-rg-terraform-state' || 'dev-rg-terraform-state' }}
+      LOCATION: ${{ github.ref_name == 'main' && 'westeurope' || 'eastus2' }}
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
     permissions:
