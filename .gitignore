@@ -1,4 +1,2 @@
 environments/dev/.terraform
 environments/dev/.terraform.lock.hcl
-environments/dev/terraform.tfstate
-environments/dev/terraform.tfstate.backup
