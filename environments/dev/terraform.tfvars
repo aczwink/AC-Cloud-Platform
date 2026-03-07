@@ -1,2 +1,2 @@
 location = "eastus2"
-servicePrincipalObjectId = "4317b941-bcac-4482-b844-0bc2018b2213"
+servicePrincipalObjectId = "d00fe54a-acd1-493b-b072-759c55054e0f"
