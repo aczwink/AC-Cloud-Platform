@@ -13,14 +13,15 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    env:
+      RG_NAME: prd-rg-terraform-state
+      LOCATION: westeurope
+    environment: production
 
     permissions:
       id-token: write
 
-    env:
-      RG_NAME: prd-rg-terraform-state
-      LOCATION: westeurope
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout
