@@ -13,3 +13,9 @@ resource "azurerm_storage_container" "dbContainer" {
     name = "dbstorage"
     storage_account_id = azurerm_storage_account.storageAccount.id
 }
+
+resource "azurerm_role_assignment" "dataContributorRoleAssignment" {
+    scope = azurerm_storage_container.dbContainer.id
+    principal_id = var.servicePrincipalObjectId
+    role_definition_name = "Storage Blob Data Contributor"
+}

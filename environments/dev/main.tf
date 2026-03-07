@@ -32,4 +32,5 @@ module "app_openarabdict" {
     appServicePlanId = module.platform.appServicePlanId
     environment = local.env
     location = var.location
+    servicePrincipalObjectId = var.servicePrincipalObjectId
 }
