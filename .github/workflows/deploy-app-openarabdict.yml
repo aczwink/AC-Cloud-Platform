@@ -8,17 +8,18 @@ on:
     workflows: ["Deploy infrastructure"]
     types:
       - completed
-    branches:
-      - main
-      - dev
 
 jobs:
   deploy:
     env:
+      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-openarabdict
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
       envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
-    #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+
     permissions:
       contents: read
       id-token: write
@@ -50,6 +51,38 @@ jobs:
         run: npm run build-db
         working-directory: ./openarabdict/builder
 
+      - name: Checkout OpenArabDictViewer repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabDictViewer
+            path: openarabdictviewer
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDictViewer backend
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./openarabdictviewer/backend
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDictViewer frontend
+        run: |
+          npm ci
+          npm run generate-api
+          npm run build
+        working-directory: ./openarabdictviewer/frontend
+
+      - name: Prepare frontend artifact for deployment
+        run: |
+          unzip -n arabdict-frontend-release.zip
+          rm arabdict-frontend-release.zip
+          mv index.htm index.html
+          echo 'window.process = { env: { ARABDICT_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", ARABDICT_BACKEND_PORT: 443, ARABDICT_BACKEND_PROTOCOL: "https" } };' >> env.js
+          echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
+        working-directory: ./openarabdictviewer/frontend/dist
+
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -63,14 +96,9 @@ jobs:
           az storage blob upload --file ./dist/en.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
         working-directory: ./openarabdict/builder
 
-      - name: Checkout OpenArabDictViewer repo
-        uses: actions/checkout@v4
+      - uses: azure/webapps-deploy@v3
         with:
-            repository: aczwink/OpenArabDictViewer
-            path: openarabdictviewer
+          app-name: ${{ env.backendName }}
+          package: 'openarabdictviewer/backend/dist/'
 
-      - name: Build OpenArabDictViewer backend
-        run: |
-          npm ci
-          npm run build
-        working-directory: ./openarabdictviewer/backend
+      #TODO deploy frontend
