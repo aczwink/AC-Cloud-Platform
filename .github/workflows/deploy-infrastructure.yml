@@ -15,9 +15,9 @@ on:
 jobs:
   deploy:
     env:
+      azureRegion: ${{ github.ref_name == 'main' && 'westeurope' || 'eastus2' }}
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
-      RG_NAME: ${{ github.ref_name == 'main' && 'prd-rg-terraform-state' || 'dev-rg-terraform-state' }}
-      LOCATION: ${{ github.ref_name == 'main' && 'westeurope' || 'eastus2' }}
+      resourceGroupName: ${{ github.ref_name == 'main' && 'prd-rg-terraform-state' || 'dev-rg-terraform-state' }}
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
     permissions:
@@ -38,23 +38,23 @@ jobs:
 
       - name: Ensure Resource Group exists
         run: |
-          az group create --name $RG_NAME --location $LOCATION
+          az group create --name ${{ env.resourceGroupName }} --location ${{ env.azureRegion }}
 
       - name: Deploy Bicep
         run: |
-          az deployment group create --resource-group $RG_NAME --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${envAbbrev}
+          az deployment group create --resource-group $RG_NAME --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${{ env.envAbbrev }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       
       - name: Terraform Init
         run: terraform init -input=false
-        working-directory: ./environments/${envAbbrev}
+        working-directory: ./environments/${{ env.envAbbrev }}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./environments/${envAbbrev}
+        working-directory: ./environments/${{ env.envAbbrev }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
-        working-directory: ./environments/${envAbbrev}
+        working-directory: ./environments/${{ env.envAbbrev }}
