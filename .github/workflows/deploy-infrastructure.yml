@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy Bicep
         run: |
-          az deployment group create --resource-group $RG_NAME --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${{ env.envAbbrev }}
+          az deployment group create --resource-group ${{ env.resourceGroupName }} --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${{ env.envAbbrev }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
