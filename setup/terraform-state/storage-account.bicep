@@ -1,5 +1,7 @@
+param environmentAbbreviation string
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
-  name: 'prdstactfstate'
+  name: '${environmentAbbreviation}stactfstate'
   location: resourceGroup().location
   sku: {
     name: 'Standard_LRS'

@@ -15,9 +15,10 @@ on:
 jobs:
   deploy:
     env:
-      RG_NAME: prd-rg-terraform-state
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      RG_NAME: ${envAbbrev}-rg-terraform-state
       LOCATION: westeurope
-    environment: production
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
     permissions:
       id-token: write
@@ -41,19 +42,19 @@ jobs:
 
       - name: Deploy Bicep
         run: |
-          az deployment group create --resource-group $RG_NAME --template-file ./setup/terraform-state/storage-account.bicep
+          az deployment group create --resource-group $RG_NAME --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${envAbbrev}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       
       - name: Terraform Init
         run: terraform init -input=false
-        working-directory: ./environments/prod
+        working-directory: ./environments/${envAbbrev}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./environments/prod
+        working-directory: ./environments/${envAbbrev}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
-        working-directory: ./environments/prod
+        working-directory: ./environments/${envAbbrev}
