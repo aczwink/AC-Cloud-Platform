@@ -1,10 +1,6 @@
 name: Deploy app - ACKungFuDoc
 
 on:
-  push: #TODO REMOVE THIS!!!!
-    branches:
-      - main
-      - dev
   workflow_run:
     workflows: ["Deploy infrastructure"]
     types:
@@ -19,7 +15,7 @@ jobs:
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
       envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
-    #TODO: add this again if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       id-token: write
 
@@ -35,9 +31,9 @@ jobs:
             repository: aczwink/KungFuWiki
             path: ackungfudoc
 
-      - name: Build ACKungFuDoc #TODO: should use ci here
+      - name: Build ACKungFuDoc
         run: |
-          npm i
+          npm ci
           npm run build
         working-directory: ./ackungfudoc
 

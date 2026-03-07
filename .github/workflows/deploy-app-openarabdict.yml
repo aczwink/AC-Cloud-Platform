@@ -35,7 +35,9 @@ jobs:
             repository: aczwink/OpenArabDict
             path: openarabdict
 
-      - name: Build OpenArabDict builder
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDict builder
         run: |
           npm ci
           npm run compile
