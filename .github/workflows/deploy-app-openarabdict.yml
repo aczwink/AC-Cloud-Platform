@@ -83,15 +83,18 @@ jobs:
           rm arabdict-frontend-release.zip
           mv index.htm index.html
           echo 'window.process = { env: { ARABDICT_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", ARABDICT_BACKEND_PORT: 443, ARABDICT_BACKEND_PROTOCOL: "https" } };' >> env.js
-          echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
         working-directory: ./openarabdictviewer/frontend/dist
 
-      #TODO: do a webpack bundle!
-      - name: Build node webserver
-        run: cp ./integration/node-webserver/package.json ./openarabdictviewer/frontend/dist/
-      - name: Build node webserver 2
-        run: npm i
-        working-directory: ./openarabdictviewer/frontend/dist/
+      - name: Building minimal node SPA web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-spa-webserver
+
+      - name: Adding minimal node SPA web server to frontend deployment
+        run: |
+          cp ./integration/node-spa-webserver/dist/main.js ./openarabdictviewer/frontend/dist/
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> package.json
 
       - name: Azure Login
         uses: azure/login@v2

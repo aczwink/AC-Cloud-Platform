@@ -1,0 +1,13 @@
+{
+    "scripts": {
+        "build": "webpack",
+        "start": "serve -s -l $PORT"
+    },
+    "dependencies": {
+        "serve": "^14.0.0"
+    },
+    "devDependencies": {
+        "webpack": "^5.105.4",
+        "webpack-cli": "^6.0.1"
+    }
+}
