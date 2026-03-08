@@ -94,7 +94,7 @@ jobs:
       - name: Adding minimal node SPA web server to frontend deployment
         run: |
           cp ./integration/node-spa-webserver/dist/main.js ./openarabdictviewer/frontend/dist/
-          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> package.json
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./openarabdictviewer/frontend/dist/package.json
 
       - name: Azure Login
         uses: azure/login@v2

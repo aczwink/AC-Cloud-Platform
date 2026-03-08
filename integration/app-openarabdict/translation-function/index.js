@@ -1,4 +1,5 @@
-const mod = require("@aczwink/openarabdict-translator");
+//const mod = require("@aczwink/openarabdict-translator"); TODO
+const mod = require("C:\\Users\\Amir Czwink\\git-repositories\\OpenArabDict\\translator\\dist\\main.js");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const os = require("os");
 const path = require("path");
