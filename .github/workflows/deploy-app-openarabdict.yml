@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout #required for integration folder
+      - name: Checkout
         uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4

@@ -1,6 +1,6 @@
 resource "azurerm_windows_function_app" "translationFunctionApp" {
     location = var.location
-    name = "${var.environment}-func-${local.appName}"
+    name = "${var.environment}-func-${local.appName}-translation"
     resource_group_name = azurerm_resource_group.rg.name
 
     functions_extension_version = "~4"    
@@ -49,5 +49,21 @@ resource "azurerm_function_app_function" "translationFunction" {
     file {
         content = file("../../integration/app-openarabdict/translation-function/dist/index.js")
         name = "index.js"
+    }
+}
+
+resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEventSubscription" {
+    name = "translate-on-dictionary-change"
+    scope = azurerm_storage_account.storageAccount.id
+
+    included_event_types = [ "Microsoft.Storage.BlobCreated" ]
+
+    azure_function_endpoint {
+      function_id = azurerm_function_app_function.translationFunction.id
+    }
+
+    subject_filter {
+      subject_begins_with = "/blobServices/default/containers/${azurerm_storage_container.dbContainer.name}/blobs/"
+      subject_ends_with = "en.json"
     }
 }

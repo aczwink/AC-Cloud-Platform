@@ -15,6 +15,8 @@ resource "azurerm_linux_web_app" "backend" {
     site_config {
         always_on = local.isProd
         app_command_line = "./bundle.js"
+        health_check_eviction_time_in_min = 2
+        health_check_path = "/dialects"
         minimum_tls_version = "1.3"
         
         application_stack {
