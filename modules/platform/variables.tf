@@ -1,3 +1,8 @@
+variable "ai_location" {
+    description = "Azure region for AI services"
+    type = string
+}
+
 variable "environment" {
     description = "Environment name"
     type = string

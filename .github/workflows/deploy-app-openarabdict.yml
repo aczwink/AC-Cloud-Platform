@@ -83,6 +83,13 @@ jobs:
           echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
         working-directory: ./openarabdictviewer/frontend/dist
 
+      #TODO: do a webpack bundle!
+      - name: Build node webserver
+        run: cp ./integration/node-webserver/package.json ./openarabdictviewer/frontend/dist/
+      - name: Build node webserver 2
+        run: npm i
+        working-directory: ./openarabdictviewer/frontend/dist/
+
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -96,9 +103,14 @@ jobs:
           az storage blob upload --file ./dist/en.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
         working-directory: ./openarabdict/builder
 
-      - uses: azure/webapps-deploy@v3
+      - name: Deploy backend
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.backendName }}
           package: 'openarabdictviewer/backend/dist/'
 
-      #TODO deploy frontend
+      - name: Deploy frontend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.envPrefix }}openarabdict
+          package: 'openarabdictviewer/frontend/dist/'

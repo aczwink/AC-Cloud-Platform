@@ -5,7 +5,7 @@ resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEven
     included_event_types = [ "Microsoft.Storage.BlobCreated" ]
 
     azure_function_endpoint {
-      function_id = "${azurerm_linux_function_app.translationFunction.id}/functions/translation-function"
+      function_id = azurerm_function_app_function.translationFunction.id
     }
 
     subject_filter {

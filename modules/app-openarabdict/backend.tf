@@ -8,7 +8,7 @@ resource "azurerm_linux_web_app" "backend" {
 
     app_settings = {
         ARABDICT_DICTDB_PATH = "/srv/db"
-        ARABDICT_ORIGIN = "https://${azurerm_static_web_app.frontend.default_host_name}"
+        ARABDICT_ORIGIN = "https://${azurerm_linux_web_app.frontend.default_hostname}"
         ARABDICT_PORT = "8080"
     }
     

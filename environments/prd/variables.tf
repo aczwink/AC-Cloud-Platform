@@ -1,3 +1,13 @@
+variable "ai_location" {
+    description = "Azure region for AI services"
+    type = string
+
+    validation {
+        condition = contains(["eastus2"], var.location)
+        error_message = "Region must be one of: eastus2."
+    }
+}
+
 variable "location" {
     description = "Azure region for this environment"
     type = string
