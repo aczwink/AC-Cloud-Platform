@@ -3,6 +3,11 @@ variable "ai_location" {
     type = string
 }
 
+variable "buildId" {
+    description = "Id of the build of Azure functions"
+    type = string
+}
+
 variable "location" {
     description = "Azure region for this environment"
     type = string

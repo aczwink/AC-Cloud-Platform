@@ -43,13 +43,12 @@ jobs:
 
       - name: Packing App - OpenArabDict / Translation function app
         run: |
-          mkdir translation-function
-          mv dist/index.js translation-function/
-          cp function.json translation-function/
-          cp ../host.json ./
-          zip -r a.zip translation-function host.json
-          mv a.zip ../../translation-function-app.zip
-        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function/
+          mkdir -p _build/translation-function
+          mv ./integration/app-openarabdict/translation-function-app/translation-function/dist/index.js _build/translation-function/
+          cp ./integration/app-openarabdict/translation-function-app/translation-function/function.json _build/translation-function/
+          cp ./integration/app-openarabdict/translation-function-app/host.json _build/
+          cd _build
+          zip -r translation-function-app-${{ github.run_id }}.zip translation-function host.json
 
       - name: Azure Login
         uses: azure/login@v2
@@ -78,5 +77,5 @@ jobs:
         working-directory: ./environments/${{ env.envAbbrev }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false -var="buildId=${{ github.run_id }}"
         working-directory: ./environments/${{ env.envAbbrev }}

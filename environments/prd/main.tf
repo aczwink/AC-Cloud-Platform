@@ -33,6 +33,7 @@ module "app_openarabdict" {
 
     ai_location = var.ai_location
     appServicePlanId = module.platform.appServicePlanId
+    buildId = var.buildId
     environment = local.env
     funcServicePlanId = module.platform.functionServicePlanId
     gptModelDeploymentName = module.platform.gptModelDeploymentName

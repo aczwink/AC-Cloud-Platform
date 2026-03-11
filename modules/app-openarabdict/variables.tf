@@ -8,6 +8,11 @@ variable "appServicePlanId" {
     type = string
 }
 
+variable "buildId" {
+    description = "Id of the build of Azure functions"
+    type = string
+}
+
 variable "environment" {
     description = "Environment name"
     type = string
