@@ -40,12 +40,16 @@ jobs:
           npm run build
         working-directory: ./ackungfudoc
 
-      #TODO: do a webpack bundle!
-      - name: Build node webserver
-        run: cp ./integration/node-webserver/package.json ./ackungfudoc/dist/out/
-      - name: Build node webserver 2
-        run: npm i
-        working-directory: ./ackungfudoc/dist/out/
+      - name: Building minimal node web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-webserver
+
+      - name: Adding minimal node web server to frontend deployment
+        run: |
+          cp ./integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
 
       - name: Azure Login
         uses: azure/login@v2

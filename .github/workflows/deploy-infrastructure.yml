@@ -26,6 +26,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Building App - OpenArabDict / Translation function
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/app-openarabdict/translation-function
+
       - name: Azure Login
         uses: azure/login@v2
         with:

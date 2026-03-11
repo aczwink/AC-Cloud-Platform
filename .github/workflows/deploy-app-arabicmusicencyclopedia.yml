@@ -28,13 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+          
       - name: Checkout OpenArabicMusicDB repo
         uses: actions/checkout@v4
         with:
             repository: aczwink/OpenArabicMusicDB
             path: openarabicmusicdb
 
-      - name: Build OpenArabicMusicDB builder
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabicMusicDB builder
         run: |
           npm ci
         working-directory: ./openarabicmusicdb/builder

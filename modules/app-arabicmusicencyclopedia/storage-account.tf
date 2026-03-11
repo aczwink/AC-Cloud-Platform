@@ -6,6 +6,7 @@ resource "azurerm_storage_account" "storageAccount" {
     account_kind = "StorageV2"
     account_replication_type = "LRS"
     account_tier = "Standard"
+    min_tls_version = "TLS1_2"
     shared_access_key_enabled = true //required for mounting
 }
 

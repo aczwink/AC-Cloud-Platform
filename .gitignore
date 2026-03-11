@@ -4,3 +4,4 @@ integration/app-openarabdict/translation-function/dist
 integration/app-openarabdict/translation-function/node_modules
 integration/node-spa-webserver/dist
 integration/node-spa-webserver/node_modules
+integration/node-webserver/node_modules
