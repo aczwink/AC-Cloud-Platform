@@ -50,6 +50,13 @@ jobs:
           npm ci
         working-directory: ./openarabicmusicdb/builder
 
+      #build backend api
+      - name: Build backend api
+        run: |
+          npm ci
+          npm run build-release-package
+        working-directory: ./arabicmusicencyclopedia/backend
+
       #build frontend
       - name: Checkout ArabicMusicEncyclopedia repo
         uses: actions/checkout@v4
@@ -69,7 +76,7 @@ jobs:
 
       - name: Configuring frontend
         run: |
-          echo 'window.process = { env: { AME_BACKEND_HOSTNAME: "arabicmusicencyclopedia-backend.azurewebsites.net", AME_BACKEND_PORT: 443, AME_BACKEND_PROTOCOL: "https" } };' >> env.js
+          echo 'window.process = { env: { AME_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", AME_BACKEND_PORT: 443, AME_BACKEND_PROTOCOL: "https" } };' >> env.js
           echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
         working-directory: ./arabicmusicencyclopedia/frontend/dist
 
