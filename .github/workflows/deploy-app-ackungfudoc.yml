@@ -52,7 +52,7 @@ jobs:
       - name: Adding minimal node web server to frontend deployment
         run: |
           cp ./integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
-          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
+          echo '{ "scripts": { "start": "node main.js -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
 
       - name: Azure Login
         uses: azure/login@v2
@@ -64,5 +64,5 @@ jobs:
       - name: Deploying to App Service
         run: |
           zip -r ./azure.zip .
-          az webapp deploy --resource-group ${envAbbrev}-rg-kungfudoc --name ${envPrefix}ackungfudoc --src-path ./azure.zip
+          az webapp deploy --resource-group ${envAbbrev}-rg-kungfudoc --name ${{ env.envPrefix }}ackungfudoc --src-path ./azure.zip
         working-directory: ./ackungfudoc/dist/out

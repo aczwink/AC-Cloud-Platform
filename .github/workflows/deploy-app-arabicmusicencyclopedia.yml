@@ -108,7 +108,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Publish OpenArabicMusicDB database to Azure
-        run: az storage blob upload --file ./dist/db.json --blob-url https://${envPrefix}stamedbstorage.blob.core.windows.net/dbstorage/db.json --auth-mode login --overwrite
+        run: az storage blob upload --file ./dist/db.json --blob-url https://${{ env.envAbbrev }}stamedbstorage.blob.core.windows.net/dbstorage/db.json --auth-mode login --overwrite
         working-directory: ./openarabicmusicdb/builder
 
       - name: Deploy backend

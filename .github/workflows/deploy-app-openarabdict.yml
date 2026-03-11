@@ -110,8 +110,8 @@ jobs:
 
       - name: Publish OpenArabDict database to Azure
         run: |
-          az storage blob upload --file ./dist/dict.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/dict.json --auth-mode login --overwrite
-          az storage blob upload --file ./dist/en.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
+          az storage blob upload --file ./dist/dict.json --blob-url https://${{ env.envAbbrev }}stopenarabdict.blob.core.windows.net/dbstorage/dict.json --auth-mode login --overwrite
+          az storage blob upload --file ./dist/en.json --blob-url https://${{ env.envAbbrev }}stopenarabdict.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
         working-directory: ./openarabdict/builder
 
       - name: Deploy backend
