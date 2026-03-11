@@ -41,6 +41,10 @@ jobs:
           npm run build
         working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
 
+      - name: Create build folder
+        run: |
+          mkdir -p ./_build
+
       - name: Packing App - OpenArabDict / Restart function app
         run: zip -r ../../../_build/restart-function-app-${{ github.run_id }}.zip ./*
         working-directory: ./integration/app-openarabdict/restart-function-app
