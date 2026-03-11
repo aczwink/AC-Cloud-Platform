@@ -50,19 +50,19 @@ jobs:
           npm ci
         working-directory: ./openarabicmusicdb/builder
 
-      #build backend api
-      - name: Build backend api
-        run: |
-          npm ci
-          npm run build-release-package
-        working-directory: ./arabicmusicencyclopedia/backend
-
       #build frontend
       - name: Checkout ArabicMusicEncyclopedia repo
         uses: actions/checkout@v4
         with:
             repository: aczwink/ArabicMusicEncyclopedia
             path: arabicmusicencyclopedia
+
+      #build backend api
+      - name: Build backend api
+        run: |
+          npm ci
+          npm run build-release-package
+        working-directory: ./arabicmusicencyclopedia/backend
 
       - env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
