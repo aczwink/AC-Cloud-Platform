@@ -31,10 +31,17 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      #setup
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
+
+      - name: Building minimal node SPA web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-spa-webserver
 
       #build database          
       - name: Checkout OpenArabicMusicDB repo
@@ -48,6 +55,11 @@ jobs:
         name: Build OpenArabicMusicDB builder
         run: |
           npm ci
+          npm run compile
+        working-directory: ./openarabicmusicdb/builder
+
+      - name: Build OpenArabicMusicDB database
+        run: npm run build-db
         working-directory: ./openarabicmusicdb/builder
 
       #build frontend
@@ -57,7 +69,6 @@ jobs:
             repository: aczwink/ArabicMusicEncyclopedia
             path: arabicmusicencyclopedia
 
-      #build backend api
       - env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         name: Build backend api
@@ -79,8 +90,12 @@ jobs:
       - name: Configuring frontend
         run: |
           echo 'window.process = { env: { AME_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", AME_BACKEND_PORT: 443, AME_BACKEND_PROTOCOL: "https" } };' >> env.js
-          echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
         working-directory: ./arabicmusicencyclopedia/frontend/dist
+
+      - name: Adding minimal node SPA web server to frontend deployment
+        run: |
+          cp ./integration/node-spa-webserver/dist/main.js ./arabicmusicencyclopedia/frontend/dist/
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./arabicmusicencyclopedia/frontend/dist/package.json
 
       #Deploy
       - uses: azure/login@v1
@@ -89,8 +104,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      #Deploy backend to azure
-      - uses: azure/webapps-deploy@v3
+      - name: Publish OpenArabicMusicDB database to Azure
+        run: az storage blob upload --file ./dist/db.json --blob-url https://${envPrefix}stamedbstorage.blob.core.windows.net/dbstorage/db.json --auth-mode login --overwrite
+        working-directory: ./openarabicmusicdb/builder
+
+      - name: Deploy backend
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.backendName }}
           images: 'ghcr.io/aczwink/arabicmusicencyclopedia:latest'
+
+      - name: Deploy frontend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.envPrefix }}openarabdict
+          package: 'arabicmusicencyclopedia/frontend/dist/'

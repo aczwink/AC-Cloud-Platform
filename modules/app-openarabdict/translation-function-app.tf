@@ -7,6 +7,7 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
     service_plan_id = var.funcServicePlanId
     storage_account_access_key = azurerm_storage_account.storageAccount.primary_access_key
     storage_account_name = azurerm_storage_account.storageAccount.name
+    zip_deploy_file = "../../integration/app-openarabdict/translate-function-app.zip"
 
     app_settings = {
         ACPLATFORM_INT_CONTAINER_NAME: azurerm_storage_container.dbContainer.name
@@ -29,29 +30,6 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
     }
 }
 
-resource "azurerm_function_app_function" "translationFunction" {
-    name = "translation-function"
-    
-    function_app_id = azurerm_windows_function_app.translationFunctionApp.id
-    language = "Javascript"
-    
-    config_json = jsonencode({
-        "bindings" = [
-            {
-                "direction" = "in"
-                "name" = "eventGridEvent"
-                "type" = "eventGridTrigger"
-            }
-        ],
-        "scriptFile": "index.js"
-    })
-
-    file {
-        content = file("../../integration/app-openarabdict/translation-function/dist/index.js")
-        name = "index.js"
-    }
-}
-
 resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEventSubscription" {
     name = "translate-on-dictionary-change"
     scope = azurerm_storage_account.storageAccount.id
@@ -59,11 +37,11 @@ resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEven
     included_event_types = [ "Microsoft.Storage.BlobCreated" ]
 
     azure_function_endpoint {
-      function_id = azurerm_function_app_function.translationFunction.id
+        function_id = "${azurerm_windows_function_app.translationFunctionApp.id}/functions/translate-function"
     }
 
     subject_filter {
-      subject_begins_with = "/blobServices/default/containers/${azurerm_storage_container.dbContainer.name}/blobs/"
-      subject_ends_with = "en.json"
+        subject_begins_with = "/blobServices/default/containers/${azurerm_storage_container.dbContainer.name}/blobs/"
+        subject_ends_with = "en.json"
     }
 }

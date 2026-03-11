@@ -1,7 +1,7 @@
 environments/dev/.terraform
 environments/dev/.terraform.lock.hcl
-integration/app-openarabdict/translation-function/dist
-integration/app-openarabdict/translation-function/node_modules
+integration/app-openarabdict/translation-function-app/translation-function/dist
+integration/app-openarabdict/translation-function-app/translation-function/node_modules
 integration/node-spa-webserver/dist
 integration/node-spa-webserver/node_modules
 integration/node-webserver/node_modules

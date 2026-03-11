@@ -39,7 +39,7 @@ jobs:
         run: |
           npm ci
           npm run build
-        working-directory: ./integration/app-openarabdict/translation-function
+        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
 
       - name: Azure Login
         uses: azure/login@v2

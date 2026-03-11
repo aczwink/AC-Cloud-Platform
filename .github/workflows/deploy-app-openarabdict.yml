@@ -28,14 +28,22 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      #setup
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
 
+      - name: Building minimal node SPA web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-spa-webserver
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #build database
       - name: Checkout OpenArabDict repo
         uses: actions/checkout@v4
         with:
@@ -54,6 +62,8 @@ jobs:
         run: npm run build-db
         working-directory: ./openarabdict/builder
 
+
+      #build app
       - name: Checkout OpenArabDictViewer repo
         uses: actions/checkout@v4
         with:
@@ -85,17 +95,12 @@ jobs:
           echo 'window.process = { env: { ARABDICT_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", ARABDICT_BACKEND_PORT: 443, ARABDICT_BACKEND_PROTOCOL: "https" } };' >> env.js
         working-directory: ./openarabdictviewer/frontend/dist
 
-      - name: Building minimal node SPA web server
-        run: |
-          npm ci
-          npm run build
-        working-directory: ./integration/node-spa-webserver
-
       - name: Adding minimal node SPA web server to frontend deployment
         run: |
           cp ./integration/node-spa-webserver/dist/main.js ./openarabdictviewer/frontend/dist/
           echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./openarabdictviewer/frontend/dist/package.json
 
+      #Deploy to Azure
       - name: Azure Login
         uses: azure/login@v2
         with:
