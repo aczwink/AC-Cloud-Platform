@@ -120,5 +120,5 @@ jobs:
       - name: Deploy frontend
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.envPrefix }}openarabdict
+          app-name: ${{ env.envPrefix }}arabicmusicencyclopedia
           package: 'arabicmusicencyclopedia/frontend/dist/'
