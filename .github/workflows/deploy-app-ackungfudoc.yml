@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Checkout ACKungFuDoc repo
         uses: actions/checkout@v4
         with:
