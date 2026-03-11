@@ -46,7 +46,8 @@ jobs:
           mkdir translation-function
           mv dist/index.js translation-function/
           cp function.json translation-function/
-          zip -r a.zip translation-function
+          cp ../host.json ./
+          zip -r a.zip translation-function host.json
           mv a.zip ../../translation-function-app.zip
         working-directory: ./integration/app-openarabdict/translation-function-app/translation-function/
 
