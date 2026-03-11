@@ -7,7 +7,7 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
     service_plan_id = var.funcServicePlanId
     storage_account_access_key = azurerm_storage_account.storageAccount.primary_access_key
     storage_account_name = azurerm_storage_account.storageAccount.name
-    zip_deploy_file = "../../integration/app-openarabdict/translate-function-app.zip"
+    zip_deploy_file = "../../integration/app-openarabdict/translation-function-app.zip"
 
     app_settings = {
         ACPLATFORM_INT_CONTAINER_NAME: azurerm_storage_container.dbContainer.name
@@ -37,7 +37,7 @@ resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEven
     included_event_types = [ "Microsoft.Storage.BlobCreated" ]
 
     azure_function_endpoint {
-        function_id = "${azurerm_windows_function_app.translationFunctionApp.id}/functions/translate-function"
+        function_id = "${azurerm_windows_function_app.translationFunctionApp.id}/functions/translation-function"
     }
 
     subject_filter {
