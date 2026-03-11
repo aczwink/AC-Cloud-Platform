@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       #setup
       - uses: actions/setup-node@v4
         with:
@@ -39,9 +42,6 @@ jobs:
           npm ci
           npm run build
         working-directory: ./integration/node-spa-webserver
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       #build database
       - name: Checkout OpenArabDict repo

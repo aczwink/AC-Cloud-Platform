@@ -8,7 +8,7 @@ resource "azurerm_linux_web_app" "backend" {
 
     app_settings = {
         AME_DICTDB_PATH = "/srv/db/db.json"
-        AME_ORIGIN = "https://${azurerm_static_web_app.frontend.default_host_name}"
+        AME_ORIGIN = "https://${azurerm_linux_web_app.frontend.default_hostname}"
         AME_PORT = "8080"
     }
     
