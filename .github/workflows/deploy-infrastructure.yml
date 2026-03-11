@@ -41,6 +41,13 @@ jobs:
           npm run build
         working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
 
+      - name: Packing App - OpenArabDict / Translation function app
+        run: |
+          cp ../function.json ./
+          zip a.zip function.json index.js
+          mv a.zip ../../../translate-function-app.zip
+        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function/dist
+
       - name: Azure Login
         uses: azure/login@v2
         with:
