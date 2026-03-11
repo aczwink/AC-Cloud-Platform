@@ -3,7 +3,7 @@ variable "ai_location" {
     type = string
 
     validation {
-        condition = contains(["eastus2"], var.location)
+        condition = contains(["eastus2"], var.ai_location)
         error_message = "Region must be one of: eastus2."
     }
 }
