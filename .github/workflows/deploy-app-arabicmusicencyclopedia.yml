@@ -15,6 +15,7 @@ on:
 jobs:
   deploy:
     env:
+      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-arabicmusicencyclopedia
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
       envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
 
@@ -56,7 +57,9 @@ jobs:
             repository: aczwink/ArabicMusicEncyclopedia
             path: arabicmusicencyclopedia
 
-      - name: Build frontend
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build frontend
         run: |
           sudo apt install -y ruby-sass
           npm ci
@@ -68,7 +71,7 @@ jobs:
         run: |
           echo 'window.process = { env: { AME_BACKEND_HOSTNAME: "arabicmusicencyclopedia-backend.azurewebsites.net", AME_BACKEND_PORT: 443, AME_BACKEND_PROTOCOL: "https" } };' >> env.js
           echo '{ "navigationFallback": { "rewrite": "/index.html" } }' >> staticwebapp.config.json
-        working-directory: ./frontend/dist
+        working-directory: ./arabicmusicencyclopedia/frontend/dist
 
       #Deploy
       - uses: azure/login@v1
@@ -80,6 +83,5 @@ jobs:
       #Deploy backend to azure
       - uses: azure/webapps-deploy@v3
         with:
-          app-name: 'arabicmusicencyclopedia-backend'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          app-name: ${{ env.backendName }}
           images: 'ghcr.io/aczwink/arabicmusicencyclopedia:latest'

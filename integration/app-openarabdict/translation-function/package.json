@@ -15,6 +15,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "@aczwink/openarabdict-translator": "^1.0.0",
     "@azure/storage-blob": "^12.31.0"
   }
 }
