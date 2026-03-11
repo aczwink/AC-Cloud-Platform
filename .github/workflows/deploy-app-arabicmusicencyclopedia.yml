@@ -1,0 +1,124 @@
+name: Deploy app - ArabicMusicEncyclopedia
+
+on:
+  push:
+    paths:
+      - .github/workflows/deploy-app-arabicmusicencyclopedia.yml
+  workflow_run:
+    workflows: ["Deploy infrastructure"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    env:
+      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-arabicmusicencyclopedia
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      #setup
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Building minimal node SPA web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-spa-webserver
+
+      #build database          
+      - name: Checkout OpenArabicMusicDB repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabicMusicDB
+            path: openarabicmusicdb
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabicMusicDB builder
+        run: |
+          npm ci
+          npm run compile
+        working-directory: ./openarabicmusicdb/builder
+
+      - name: Build OpenArabicMusicDB database
+        run: npm run build-db
+        working-directory: ./openarabicmusicdb/builder
+
+      #build frontend
+      - name: Checkout ArabicMusicEncyclopedia repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/ArabicMusicEncyclopedia
+            path: arabicmusicencyclopedia
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build backend api
+        run: |
+          npm ci
+          npm run build-release-package
+        working-directory: ./arabicmusicencyclopedia/backend
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build frontend
+        run: |
+          sudo apt install -y ruby-sass
+          npm ci
+          npm run generate-api-and-theme
+          npm run create-release-pkg
+        working-directory: ./arabicmusicencyclopedia/frontend
+
+      - name: Configuring frontend
+        run: |
+          echo 'window.process = { env: { AME_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", AME_BACKEND_PORT: 443, AME_BACKEND_PROTOCOL: "https" } };' >> env.js
+        working-directory: ./arabicmusicencyclopedia/frontend/dist
+
+      - name: Adding minimal node SPA web server to frontend deployment
+        run: |
+          cp ./integration/node-spa-webserver/dist/main.js ./arabicmusicencyclopedia/frontend/dist/
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./arabicmusicencyclopedia/frontend/dist/package.json
+
+      #Deploy
+      - uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Publish OpenArabicMusicDB database to Azure
+        run: az storage blob upload --file ./dist/db.json --blob-url https://${envPrefix}stamedbstorage.blob.core.windows.net/dbstorage/db.json --auth-mode login --overwrite
+        working-directory: ./openarabicmusicdb/builder
+
+      - name: Deploy backend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.backendName }}
+          images: 'ghcr.io/aczwink/arabicmusicencyclopedia:latest'
+
+      - name: Deploy frontend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.envPrefix }}arabicmusicencyclopedia
+          package: 'arabicmusicencyclopedia/frontend/dist/'

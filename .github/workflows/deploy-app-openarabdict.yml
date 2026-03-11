@@ -1,0 +1,127 @@
+name: Deploy app - OpenArabDict
+
+on:
+  push:
+    paths:
+      - .github/workflows/deploy-app-openarabdict.yml
+  workflow_run:
+    workflows: ["Deploy infrastructure"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    env:
+      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-openarabdict
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      #setup
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Building minimal node SPA web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-spa-webserver
+
+      #build database
+      - name: Checkout OpenArabDict repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabDict
+            path: openarabdict
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDict builder
+        run: |
+          npm ci
+          npm run compile
+        working-directory: ./openarabdict/builder
+
+      - name: Build OpenArabDict database
+        run: npm run build-db
+        working-directory: ./openarabdict/builder
+
+
+      #build app
+      - name: Checkout OpenArabDictViewer repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/OpenArabDictViewer
+            path: openarabdictviewer
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDictViewer backend
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./openarabdictviewer/backend
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build OpenArabDictViewer frontend
+        run: |
+          npm ci
+          npm run generate-api
+          npm run build
+        working-directory: ./openarabdictviewer/frontend
+
+      - name: Prepare frontend artifact for deployment
+        run: |
+          unzip -n arabdict-frontend-release.zip
+          rm arabdict-frontend-release.zip
+          mv index.htm index.html
+          echo 'window.process = { env: { ARABDICT_BACKEND_HOSTNAME: "${{ env.backendName }}.azurewebsites.net", ARABDICT_BACKEND_PORT: 443, ARABDICT_BACKEND_PROTOCOL: "https" } };' >> env.js
+        working-directory: ./openarabdictviewer/frontend/dist
+
+      - name: Adding minimal node SPA web server to frontend deployment
+        run: |
+          cp ./integration/node-spa-webserver/dist/main.js ./openarabdictviewer/frontend/dist/
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./openarabdictviewer/frontend/dist/package.json
+
+      #Deploy to Azure
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Publish OpenArabDict database to Azure
+        run: |
+          az storage blob upload --file ./dist/dict.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/dict.json --auth-mode login --overwrite
+          az storage blob upload --file ./dist/en.json --blob-url https://${envPrefix}stopenarabdict.blob.core.windows.net/dbstorage/en.json --auth-mode login --overwrite
+        working-directory: ./openarabdict/builder
+
+      - name: Deploy backend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.backendName }}
+          package: 'openarabdictviewer/backend/dist/'
+
+      - name: Deploy frontend
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.envPrefix }}openarabdict
+          package: 'openarabdictviewer/frontend/dist/'

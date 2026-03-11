@@ -1,0 +1,68 @@
+name: Deploy app - ACKungFuDoc
+
+on:
+  push:
+    paths:
+      - .github/workflows/deploy-app-ackungfudoc.yml
+  workflow_run:
+    workflows: ["Deploy infrastructure"]
+    types:
+      - completed
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    env:
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Checkout ACKungFuDoc repo
+        uses: actions/checkout@v4
+        with:
+            repository: aczwink/KungFuWiki
+            path: ackungfudoc
+
+      - name: Build ACKungFuDoc
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./ackungfudoc
+
+      - name: Building minimal node web server
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/node-webserver
+
+      - name: Adding minimal node web server to frontend deployment
+        run: |
+          cp ./integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
+          echo '{ "scripts": { "start": "node main.js -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: Deploying to App Service
+        run: |
+          zip -r ./azure.zip .
+          az webapp deploy --resource-group ${envAbbrev}-rg-kungfudoc --name ${envPrefix}ackungfudoc --src-path ./azure.zip
+        working-directory: ./ackungfudoc/dist/out

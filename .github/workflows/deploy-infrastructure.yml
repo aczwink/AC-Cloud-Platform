@@ -1,0 +1,91 @@
+name: Deploy infrastructure
+
+on:
+  push:
+    paths:
+      - .github/workflows/deploy-infrastructure.yml
+      - environments/**
+      - modules/**
+  schedule:
+    - cron: 0 3 * * 1
+
+jobs:
+  deploy:
+    env:
+      azureRegion: ${{ github.ref_name == 'main' && 'westeurope' || 'eastus2' }}
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      resourceGroupName: ${{ github.ref_name == 'main' && 'prd-rg-terraform-state' || 'dev-rg-terraform-state' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      #building functions
+      - name: Create build folder
+        run: |
+          mkdir -p ./_build
+
+      - name: Packing App - OpenArabDict / Restart function app
+        run: zip -r ../../../_build/restart-function-app-${{ github.run_id }}.zip ./*
+        working-directory: ./integration/app-openarabdict/restart-function-app
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Building App - OpenArabDict / Translation function
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
+
+      - name: Packing App - OpenArabDict / Translation function app
+        run: |
+          mkdir -p _build/translation-function
+          mv ./integration/app-openarabdict/translation-function-app/translation-function/dist/index.js _build/translation-function/
+          cp ./integration/app-openarabdict/translation-function-app/translation-function/function.json _build/translation-function/
+          cp ./integration/app-openarabdict/translation-function-app/host.json _build/
+          cd _build
+          zip -r translation-function-app-${{ github.run_id }}.zip translation-function host.json
+
+      #Deploy
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure Resource Group exists
+        run: |
+          az group create --name ${{ env.resourceGroupName }} --location ${{ env.azureRegion }}
+
+      - name: Deploy Bicep
+        run: |
+          az deployment group create --resource-group ${{ env.resourceGroupName }} --template-file ./setup/terraform-state/storage-account.bicep --parameters environmentAbbreviation=${{ env.envAbbrev }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ./environments/${{ env.envAbbrev }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./environments/${{ env.envAbbrev }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false -var="buildId=${{ github.run_id }}"
+        working-directory: ./environments/${{ env.envAbbrev }}
