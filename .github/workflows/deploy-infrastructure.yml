@@ -33,14 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        name: Building App - OpenArabDict / Translation function
-        run: |
-          npm ci
-          npm run build
-        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
-
+      #building functions
       - name: Create build folder
         run: |
           mkdir -p ./_build
@@ -48,6 +41,14 @@ jobs:
       - name: Packing App - OpenArabDict / Restart function app
         run: zip -r ../../../_build/restart-function-app-${{ github.run_id }}.zip ./*
         working-directory: ./integration/app-openarabdict/restart-function-app
+
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Building App - OpenArabDict / Translation function
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
 
       - name: Packing App - OpenArabDict / Translation function app
         run: |
@@ -58,6 +59,7 @@ jobs:
           cd _build
           zip -r translation-function-app-${{ github.run_id }}.zip translation-function host.json
 
+      #Deploy
       - name: Azure Login
         uses: azure/login@v2
         with:
