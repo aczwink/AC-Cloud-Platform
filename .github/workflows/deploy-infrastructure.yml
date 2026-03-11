@@ -44,8 +44,9 @@ jobs:
       - name: Packing App - OpenArabDict / Translation function app
         run: |
           mkdir translation-function
-          mv dist/index.js translation-function/index.js
-          zip -r a.zip function.json translation-function
+          mv dist/index.js translation-function/
+          cp function.json translation-function/
+          zip -r a.zip translation-function
           mv a.zip ../../translation-function-app.zip
         working-directory: ./integration/app-openarabdict/translation-function-app/translation-function/
 
