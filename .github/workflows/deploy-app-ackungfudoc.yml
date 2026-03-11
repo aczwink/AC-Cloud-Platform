@@ -16,7 +16,7 @@ jobs:
   deploy:
     env:
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
-      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+      envPrefix: ${{ github.ref_name != 'main' && 'dev' || '' }}
 
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
@@ -52,7 +52,7 @@ jobs:
       - name: Adding minimal node web server to frontend deployment
         run: |
           cp ./integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
-          echo '{ "scripts": { "start": "node main.js -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
+          echo '{ "scripts": { "start": "node main.js -s -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
 
       - name: Azure Login
         uses: azure/login@v2

@@ -17,7 +17,7 @@ jobs:
     env:
       backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-arabicmusicencyclopedia
       envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
-      envPrefix: ${{ github.ref_name == 'main' && '' || 'dev' }}
+      envPrefix: ${{ github.ref_name != 'main' && 'dev' || '' }}
 
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
