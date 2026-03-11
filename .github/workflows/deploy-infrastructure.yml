@@ -18,7 +18,9 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
     permissions:
+      contents: read
       id-token: write
+      packages: read
 
     runs-on: ubuntu-latest
     
