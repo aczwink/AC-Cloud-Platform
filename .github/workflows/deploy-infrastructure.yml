@@ -27,11 +27,13 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
-          
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Building App - OpenArabDict / Translation function
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Building App - OpenArabDict / Translation function
         run: |
           npm ci
           npm run build

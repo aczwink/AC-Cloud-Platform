@@ -58,7 +58,9 @@ jobs:
             path: arabicmusicencyclopedia
 
       #build backend api
-      - name: Build backend api
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build backend api
         run: |
           npm ci
           npm run build-release-package
