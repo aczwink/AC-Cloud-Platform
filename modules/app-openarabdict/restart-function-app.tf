@@ -7,7 +7,7 @@ resource "azurerm_windows_function_app" "restartFunctionApp" {
     service_plan_id = var.funcServicePlanId
     storage_account_access_key = azurerm_storage_account.storageAccount.primary_access_key
     storage_account_name = azurerm_storage_account.storageAccount.name
-    zip_deploy_file = "../../integration/app-openarabdict/restart-function-app.zip"
+    zip_deploy_file = "../../_build/restart-function-app-${var.buildId}.zip"
 
     app_settings = {
         ACPLATFORM_INT_BACKEND_NAME = azurerm_linux_web_app.backend.name
