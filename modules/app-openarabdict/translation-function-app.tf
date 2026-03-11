@@ -33,6 +33,9 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
 resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEventSubscription" {
     name = "translate-on-dictionary-change"
     scope = azurerm_storage_account.storageAccount.id
+    depends_on = [
+        azurerm_windows_function_app.translationFunctionApp
+    ]
 
     included_event_types = [ "Microsoft.Storage.BlobCreated" ]
 
