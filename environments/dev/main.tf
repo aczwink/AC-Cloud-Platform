@@ -10,7 +10,7 @@ module "platform" {
     location = var.location
 }
 
-module "app_arabicmusicencyclopedia" {
+/*module "app_arabicmusicencyclopedia" {
     source = "../../modules/app-arabicmusicencyclopedia"
 
     appServicePlanId = module.platform.appServicePlanId
@@ -26,7 +26,7 @@ module "app_kungfudoc" {
     environment = local.env
     location = var.location
     logAnalyticsWorkspaceId = module.platform.logAnalyticsWorkspaceId
-}
+}*/
 
 module "app_openarabdict" {
     source = "../../modules/app-openarabdict"
