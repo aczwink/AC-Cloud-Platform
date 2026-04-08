@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/deploy-infrastructure.yml
       - environments/**
+      - integration/app-openarabdict/**
       - modules/**
   schedule:
     - cron: 0 3 * * 1
