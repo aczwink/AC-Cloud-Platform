@@ -4,6 +4,11 @@
             "type": "eventGridTrigger",
             "name": "eventGridEvent",
             "direction": "in"
+        },
+        {
+            "type": "durableClient",
+            "name": "durableClient",
+            "direction": "in"
         }
     ],
     "scriptFile": "index.js"

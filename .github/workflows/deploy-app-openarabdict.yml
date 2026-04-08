@@ -6,17 +6,19 @@ on:
       - .github/workflows/deploy-app-openarabdict.yml
   workflow_run:
     workflows: ["Deploy infrastructure"]
+    branches:
+      - main
     types:
       - completed
 
 jobs:
   deploy:
     env:
-      backendName: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'prd' || 'dev' }}-app-openarabdict
-      envAbbrev: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'prd' || 'dev' }}
-      envPrefix: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) != 'main' && 'dev' || '' }}
+      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-openarabdict
+      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ github.ref_name != 'main' && 'dev' || '' }}
 
-    environment: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'development' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
 
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
 
@@ -28,13 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Adding minimal node SPA web server to frontend deployment
-        run: |
-          echo "${{ github.ref_name }}"
-          echo "${{ env.backendName }}"
-          echo "${{ env.envAbbrev }}"
-          echo "${{ env.envPrefix }}"
-
       - name: Checkout
         uses: actions/checkout@v4
         
