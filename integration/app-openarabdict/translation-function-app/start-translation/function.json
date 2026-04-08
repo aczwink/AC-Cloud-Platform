@@ -6,9 +6,11 @@
             "direction": "in"
         },
         {
-            "type": "durableClient",
-            "name": "durableClient",
-            "direction": "in"
+            "type": "queue",
+            "name": "queueOutput",
+            "queueName": "translation-queue",
+            "connection": "AzureWebJobsStorage",
+            "direction": "out"
         }
     ],
     "scriptFile": "index.js"

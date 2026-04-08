@@ -1,5 +1,4 @@
 {
   "dependencies": {
-    "durable-functions": "^3.3.0"
   }
 }
