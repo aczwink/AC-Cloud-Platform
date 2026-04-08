@@ -4,5 +4,5 @@ resource "azurerm_cognitive_account" "translatorService" {
     resource_group_name = azurerm_resource_group.platformRG.name
 
     kind = "TextTranslation"
-    sku_name = "F0"
+    sku_name = local.isProd ? "F0" : "S0"
 }
