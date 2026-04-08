@@ -12,11 +12,11 @@ on:
 jobs:
   deploy:
     env:
-      backendName: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}-app-openarabdict
-      envAbbrev: ${{ github.ref_name == 'main' && 'prd' || 'dev' }}
-      envPrefix: ${{ github.ref_name != 'main' && 'dev' || '' }}
+      backendName: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'prd' || 'dev' }}-app-openarabdict
+      envAbbrev: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'prd' || 'dev' }}
+      envPrefix: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) != 'main' && 'dev' || '' }}
 
-    environment: ${{ github.ref_name == 'main' && 'production' || 'development' }}
+    environment: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name) == 'main' && 'production' || 'development' }}
 
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
 

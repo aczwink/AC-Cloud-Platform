@@ -63,7 +63,8 @@ jobs:
           cp ./integration/app-openarabdict/translation-function-app/package-lock.json _build/
           cp ./integration/app-openarabdict/translation-function-app/package.json _build/
           cd _build
-          zip -r translation-function-app-${{ github.run_id }}.zip start-translation translation-function host.json package-lock.json package.json
+          npm ci
+          zip -r translation-function-app-${{ github.run_id }}.zip ./*
 
       #Deploy
       - name: Azure Login
