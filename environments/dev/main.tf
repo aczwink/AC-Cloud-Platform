@@ -10,8 +10,6 @@ module "platform" {
     location = var.location
 }
 
-/*
-
 module "app_arabicmusicencyclopedia" {
     source = "../../modules/app-arabicmusicencyclopedia"
 
@@ -29,7 +27,6 @@ module "app_kungfudoc" {
     location = var.location
     logAnalyticsWorkspaceId = module.platform.logAnalyticsWorkspaceId
 }
-*/
 
 module "app_openarabdict" {
     source = "../../modules/app-openarabdict"
