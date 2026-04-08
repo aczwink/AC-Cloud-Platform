@@ -28,6 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Adding minimal node SPA web server to frontend deployment
+        run: |
+          echo "${{ github.ref_name }}"
+          echo "${{ env.backendName }}"
+          echo "${{ env.envAbbrev }}"
+          echo "${{ env.envPrefix }}"
+
       - name: Checkout
         uses: actions/checkout@v4
         
