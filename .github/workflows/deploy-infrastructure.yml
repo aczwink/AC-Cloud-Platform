@@ -53,11 +53,17 @@ jobs:
       - name: Packing App - OpenArabDict / Translation function app
         run: |
           mkdir -p _build/translation-function
+
+          cp -r ./integration/app-openarabdict/translation-function-app/start-translation _build/
+
           mv ./integration/app-openarabdict/translation-function-app/translation-function/dist/index.js _build/translation-function/
           cp ./integration/app-openarabdict/translation-function-app/translation-function/function.json _build/translation-function/
+
           cp ./integration/app-openarabdict/translation-function-app/host.json _build/
+          cp ./integration/app-openarabdict/translation-function-app/package-lock.json _build/
+          cp ./integration/app-openarabdict/translation-function-app/package.json _build/
           cd _build
-          zip -r translation-function-app-${{ github.run_id }}.zip translation-function host.json
+          zip -r translation-function-app-${{ github.run_id }}.zip start-translation translation-function host.json package-lock.json package.json
 
       #Deploy
       - name: Azure Login
