@@ -6,6 +6,8 @@ on:
       - .github/workflows/deploy-app-openarabdict.yml
   workflow_run:
     workflows: ["Deploy infrastructure"]
+    branches:
+      - main
     types:
       - completed
 

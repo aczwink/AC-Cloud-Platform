@@ -3,7 +3,7 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
     name = "${var.environment}-func-${local.appName}-translation"
     resource_group_name = azurerm_resource_group.rg.name
 
-    functions_extension_version = "~4"    
+    functions_extension_version = "~4"
     service_plan_id = var.funcServicePlanId
     storage_account_access_key = azurerm_storage_account.storageAccount.primary_access_key
     storage_account_name = azurerm_storage_account.storageAccount.name
@@ -40,7 +40,7 @@ resource "azurerm_eventgrid_event_subscription" "translateOnDictionaryChangeEven
     included_event_types = [ "Microsoft.Storage.BlobCreated" ]
 
     azure_function_endpoint {
-        function_id = "${azurerm_windows_function_app.translationFunctionApp.id}/functions/translation-function"
+        function_id = "${azurerm_windows_function_app.translationFunctionApp.id}/functions/start-translation"
     }
 
     subject_filter {

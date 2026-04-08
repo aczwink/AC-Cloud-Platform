@@ -6,11 +6,10 @@ on:
       - .github/workflows/deploy-app-ackungfudoc.yml
   workflow_run:
     workflows: ["Deploy infrastructure"]
-    types:
-      - completed
     branches:
       - main
-      - dev
+    types:
+      - completed
 
 jobs:
   deploy:

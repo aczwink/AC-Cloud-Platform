@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/deploy-infrastructure.yml
       - environments/**
+      - integration/app-openarabdict/**
       - modules/**
   schedule:
     - cron: 0 3 * * 1
@@ -53,11 +54,18 @@ jobs:
       - name: Packing App - OpenArabDict / Translation function app
         run: |
           mkdir -p _build/translation-function
+
+          cp -r ./integration/app-openarabdict/translation-function-app/start-translation _build/
+
           mv ./integration/app-openarabdict/translation-function-app/translation-function/dist/index.js _build/translation-function/
           cp ./integration/app-openarabdict/translation-function-app/translation-function/function.json _build/translation-function/
+
           cp ./integration/app-openarabdict/translation-function-app/host.json _build/
+          cp ./integration/app-openarabdict/translation-function-app/package-lock.json _build/
+          cp ./integration/app-openarabdict/translation-function-app/package.json _build/
           cd _build
-          zip -r translation-function-app-${{ github.run_id }}.zip translation-function host.json
+          npm ci
+          zip -r translation-function-app-${{ github.run_id }}.zip ./*
 
       #Deploy
       - name: Azure Login
