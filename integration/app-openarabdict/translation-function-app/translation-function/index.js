@@ -60,43 +60,34 @@ async function UploadFileToBlob(context, blobName)
     context.log("Upload finished");
 }
 
-async function TranslateLoop(context)
+async function TranslateStep(context)
 {
     await DownloadBlobToFile(context, "en.json");
+    
+    const count = await mod.TranslateDict({
+        databasePath,
+        maxTranslations: 100,
+        targetLanguage: process.env.ACPLATFORM_INT_TRANSLATION_LANGUAGE,
+    });
+    
+    await UploadFileToBlob(context, "de.json");
+    await UploadFileToBlob(context, "mapping_en2de.json");
 
-    while(true)
-    {
-        const count = await mod.TranslateDict({
-            databasePath,
-            maxTranslations: 100,
-            targetLanguage: process.env.ACPLATFORM_INT_TRANSLATION_LANGUAGE,
-        });
-        
-        await UploadFileToBlob(context, "de.json");
-        await UploadFileToBlob(context, "mapping_en2de.json");
-        
-        if(count < 100)
-            break;
-    }
+    return count < 100;
 }
 
-module.exports = async function (context, req)
+module.exports = async function (context, msg)
 {
-    context.log("Translation function called");
-
     const lease = await AcquireLock(context);
-
+    
     try
     {
-        await TranslateLoop(context);
+        const isFinished = await TranslateStep(context);
+        if(!isFinished)
+            context.bindings.queueOutput = {};
     }
     finally
     {
         await lease.releaseLease();
     }
-
-    context.res = {
-        status: 200,
-        body: "OK"
-    };
 };

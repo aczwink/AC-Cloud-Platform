@@ -1,9 +1,18 @@
 {
     "bindings": [
         {
-            "type": "eventGridTrigger",
-            "name": "eventGridEvent",
+            "type": "queueTrigger",
+            "name": "msg",
+            "queueName": "translation-queue",
+            "connection": "AzureWebJobsStorage",
             "direction": "in"
+        },
+        {
+            "type": "queue",
+            "name": "queueOutput",
+            "queueName": "translation-queue",
+            "connection": "AzureWebJobsStorage",
+            "direction": "out"
         }
     ],
     "scriptFile": "index.js"
