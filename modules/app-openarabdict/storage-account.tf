@@ -15,6 +15,11 @@ resource "azurerm_storage_container" "dbContainer" {
     storage_account_id = azurerm_storage_account.storageAccount.id
 }
 
+resource "azurerm_storage_queue" "translationQueue" {
+    name = "translation-queue"
+    storage_account_id = azurerm_storage_account.storageAccount.id
+}
+
 resource "azurerm_role_assignment" "dataContributorRoleAssignment" {
     scope = azurerm_storage_container.dbContainer.id
     principal_id = var.servicePrincipalObjectId
