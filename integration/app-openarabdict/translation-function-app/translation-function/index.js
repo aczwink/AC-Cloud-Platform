@@ -25,7 +25,7 @@ async function AcquireLock(context)
     return leaseClient;
 }
 
-async function DownloadBlobToFile(context, blobName)
+async function DownloadBlobToFile(context, blobName, checkExistence)
 {
     const connectionString = process.env.AzureWebJobsStorage;
     const containerName = process.env.ACPLATFORM_INT_CONTAINER_NAME;
@@ -37,6 +37,15 @@ async function DownloadBlobToFile(context, blobName)
     const blobClient = containerClient.getBlobClient(blobName);
 
     context.log(`Downloading blob ${blobName} to ${filePath}...`);
+
+    if(checkExistence)
+    {
+        const exists = await blobClient.exists();
+        if(!exists)
+            return;
+
+        context.log(`Blob ${blobName} does not exist...`);
+    }
 
     await blobClient.downloadToFile(filePath);
 
@@ -62,7 +71,10 @@ async function UploadFileToBlob(context, blobName)
 
 async function TranslateStep(context)
 {
-    await DownloadBlobToFile(context, "en.json");
+    await DownloadBlobToFile(context, "en.json", false);
+
+    await DownloadBlobToFile(context, "de.json", true);
+    await DownloadBlobToFile(context, "mapping_en2de.json", true);
     
     const count = await mod.TranslateDict({
         databasePath,
