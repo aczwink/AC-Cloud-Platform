@@ -25,7 +25,7 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
         application_insights_key = azurerm_application_insights.appInsights.instrumentation_key
 
         application_stack {
-            node_version = "~20"
+            node_version = "~22"
         }
     }
 }

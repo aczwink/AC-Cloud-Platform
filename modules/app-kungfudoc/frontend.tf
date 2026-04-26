@@ -15,7 +15,7 @@ resource "azurerm_linux_web_app" "frontend" {
         always_on = local.isProd
 
         application_stack {
-          node_version = "20-lts"
+          node_version = "22-lts"
         }
     }
 }
