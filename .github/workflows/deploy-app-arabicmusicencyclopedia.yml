@@ -76,7 +76,7 @@ jobs:
         name: Build backend api
         run: |
           npm ci
-          npm run build-release-package
+          npm run build
         working-directory: ./arabicmusicencyclopedia/backend
 
       - env:
