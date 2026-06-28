@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backend
+  name: backend
+  namespace: arabicmusicencyclopedia
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - env:
+          - name: AME_DICTDB_PATH
+            value: /mnt/db.json
+          - name: AME_PORT
+            value: "8080"
+          image: ghcr.io/aczwink/arabicmusicencyclopedia:latest
+          name: backend
+          volumeMounts:
+            - name: app-files
+              mountPath: /mnt
+              readOnly: true
+      volumes:
+        - name: app-files
+          persistentVolumeClaim:
+            claimName: app-files-pvc
