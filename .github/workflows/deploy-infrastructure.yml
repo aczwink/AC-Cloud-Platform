@@ -40,8 +40,8 @@ jobs:
           mkdir -p ./_build
 
       - name: Packing App - OpenArabDict / Restart function app
-        run: zip -r ../../../_build/restart-function-app-${{ github.run_id }}.zip ./*
-        working-directory: ./integration/app-openarabdict/restart-function-app
+        run: zip -r ../../../../_build/restart-function-app-${{ github.run_id }}.zip ./*
+        working-directory: ./azure/integration/app-openarabdict/restart-function-app
 
       - env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
