@@ -49,7 +49,7 @@ jobs:
         run: |
           npm ci
           npm run build
-        working-directory: ./integration/app-openarabdict/translation-function-app/translation-function
+        working-directory: ./azure/integration/app-openarabdict/translation-function-app/translation-function
 
       - name: Packing App - OpenArabDict / Translation function app
         run: |
