@@ -1,3 +1,8 @@
+aks/infrastructure/.terraform
+aks/infrastructure/.terraform.lock.hcl
+aks/infrastructure/.terraform.tfstate.lock.info
+aks/infrastructure/terraform.tfstate
+aks/infrastructure/terraform.tfstate.backup
 azure/environments/dev/.terraform
 azure/environments/dev/.terraform.lock.hcl
 azure/environments/prd/.terraform

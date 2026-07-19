@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: app-files-pv
+  name: app-arabicmusicencyclopedia-pv
 spec:
   capacity:
     storage: 1Gi
@@ -11,9 +11,8 @@ spec:
   storageClassName: azurefile-csi
   csi:
     driver: file.csi.azure.com
-    volumeHandle: app-files-pv
+    volumeHandle: app-arabicmusicencyclopedia-pv
     volumeAttributes:
-      shareName: app-files
+      shareName: app-arabicmusicencyclopedia
     nodeStageSecretRef:
       name: azure-files-secret
-      namespace: arabicmusicencyclopedia

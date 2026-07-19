@@ -30,4 +30,4 @@ spec:
       volumes:
         - name: app-files
           persistentVolumeClaim:
-            claimName: app-files-pvc
+            claimName: app-arabicmusicencyclopedia-pvc
