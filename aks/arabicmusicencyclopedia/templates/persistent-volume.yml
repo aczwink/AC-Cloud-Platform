@@ -16,3 +16,4 @@ spec:
       shareName: app-arabicmusicencyclopedia
     nodeStageSecretRef:
       name: azure-files-secret
+      namespace: default

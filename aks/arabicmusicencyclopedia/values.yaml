@@ -1,0 +1,2 @@
+frontend:
+  #origin: http://x.x.x.x set via deploy.sh to the frontend ip of the app gateway
