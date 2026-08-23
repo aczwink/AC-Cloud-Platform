@@ -46,11 +46,11 @@ jobs:
         run: |
           npm ci
           npm run build
-        working-directory: ./integration/node-webserver
+        working-directory: ./azure/integration/node-webserver
 
       - name: Adding minimal node web server to frontend deployment
         run: |
-          cp ./integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
+          cp ./azure/integration/node-webserver/dist/main.js ./ackungfudoc/dist/out/
           echo '{ "scripts": { "start": "node main.js -l $PORT" } }' >> ./ackungfudoc/dist/out/package.json
 
       - name: Azure Login
