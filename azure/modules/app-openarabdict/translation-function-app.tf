@@ -23,6 +23,7 @@ resource "azurerm_windows_function_app" "translationFunctionApp" {
     site_config {
         application_insights_connection_string = azurerm_application_insights.appInsights.connection_string
         application_insights_key = azurerm_application_insights.appInsights.instrumentation_key
+        use_32_bit_worker = false
 
         application_stack {
             node_version = "~24"
