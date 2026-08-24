@@ -4,9 +4,9 @@ on:
   push:
     paths:
       - .github/workflows/deploy-infrastructure.yml
-      - environments/**
-      - integration/app-openarabdict/**
-      - modules/**
+      - azure/environments/**
+      - azure/integration/app-openarabdict/**
+      - azure/modules/**
   schedule:
     - cron: 0 3 * * 1
 
