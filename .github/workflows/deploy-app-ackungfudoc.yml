@@ -22,7 +22,9 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     
     permissions:
+      contents: read
       id-token: write
+      packages: read
 
     runs-on: ubuntu-latest
     
@@ -35,8 +37,15 @@ jobs:
         with:
             repository: aczwink/KungFuWiki
             path: ackungfudoc
+            
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com/
 
-      - name: Build ACKungFuDoc
+      - env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        name: Build ACKungFuDoc
         run: |
           npm ci
           npm run build
